@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import pagarme.converter.JSonConverter;
+import pagarme.exception.InvalidOperationException;
 import pagarme.exception.PagarMeException;
 
 public class Subscription  extends PagarMeModel{
@@ -113,20 +114,20 @@ public class Subscription  extends PagarMeModel{
 	}
 
 
-	public Collection<Subscription> listAll() throws PagarMeException{
+	public Collection<Subscription> listAll() throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsSubscriptionList(super.listAll(1000,0).getData());
 	}
 
-	public Collection<Subscription> listAllWithPagination(int totalInPage, int page) throws PagarMeException{
+	public Collection<Subscription> listAllWithPagination(int totalInPage, int page) throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsSubscriptionList(super.listAll(totalInPage,page).getData());
 	}
 
 
-	public Subscription find(int id){
+	public Subscription find(int id) throws InvalidOperationException{
 		this.id = id;
 		Subscription subs = null;
 		try {
-			subs = JSonConverter.getAsSubscription(find().getData());
+			subs = JSonConverter.getAsObject(find().getData(),Subscription.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}
@@ -135,10 +136,10 @@ public class Subscription  extends PagarMeModel{
 	}
 
 
-	public Subscription refresh(){
+	public Subscription refresh() throws InvalidOperationException{
 		Subscription subs = null;
 		try {
-			subs = JSonConverter.getAsSubscription(refreshModel().getData());
+			subs = JSonConverter.getAsObject(find().getData(),Subscription.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}

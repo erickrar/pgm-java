@@ -64,16 +64,16 @@ public abstract class PagarMeModel {
 		response.validate();
 	}
 
-	protected PagarMeQueryResponse find(){
+	protected PagarMeQueryResponse find() throws InvalidOperationException{
 		if(provider==null)
-			return null;
+			throw new InvalidOperationException("The PagarMeProvider must be set in order to use this method.");
 		result = new PagarMeQuery(provider, "GET",String.format("%s/%s",className,id)).execute();
 		return result;
 	}
 
-	protected PagarMeQueryResponse listAll(int totalPerPage, int page){
+	protected PagarMeQueryResponse listAll(int totalPerPage, int page) throws InvalidOperationException{
 		if(provider==null)
-			return null;
+			throw new InvalidOperationException("The PagarMeProvider must be set in order to use this method.");
 		PagarMeQuery query = new PagarMeQuery(provider, "GET",String.format("%s",className));
 		if(totalPerPage>0)
 			query.addQuery("count", String.valueOf(totalPerPage));

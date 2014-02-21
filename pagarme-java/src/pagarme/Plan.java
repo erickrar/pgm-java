@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import pagarme.converter.JSonConverter;
 import pagarme.exception.FormatException;
+import pagarme.exception.InvalidOperationException;
 import pagarme.exception.PagarMeException;
 
 import com.google.gson.annotations.SerializedName;
@@ -74,10 +75,10 @@ public class Plan extends PagarMeModel {
 		query.addQueries(JSonConverter.objectToMap(this));
 		result = query.execute();
 		try {
-			plan = JSonConverter.getAsPlan(result.getData());
+			plan = JSonConverter.getAsObject(result.getData(),Plan.class);
 			clonePlan(plan);
 		} catch (PagarMeException e) {
-			provider.setErrorList( JSonConverter.getAsErrorList(result.getData()));
+			provider.setErrorList( JSonConverter.getAsObject(result.getData(),PagarMeError.class));
 			 throw new PagarMeException(provider.getErrorList().showErrors());
 		}
 		
@@ -85,11 +86,11 @@ public class Plan extends PagarMeModel {
 	}
 	
 	
-	public Collection<Plan> listAll() throws PagarMeException{
+	public Collection<Plan> listAll() throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsPlanList(super.listAll(1000,0).getData());
 	}
 
-	public Collection<Plan> listAllWithPagination(int totalPerPage, int page) throws PagarMeException{
+	public Collection<Plan> listAllWithPagination(int totalPerPage, int page) throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsPlanList(super.listAll(totalPerPage,page).getData());
 	}
 
@@ -97,7 +98,7 @@ public class Plan extends PagarMeModel {
 		this.id = id;
 		Plan plan = null;
 		try {
-			plan = JSonConverter.getAsPlan(find().getData());
+			plan = JSonConverter.getAsObject(result.getData(),Plan.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}
@@ -109,7 +110,7 @@ public class Plan extends PagarMeModel {
 	public Plan refresh(){
 		Plan plan = null;
 		try {
-			plan = JSonConverter.getAsPlan(refreshModel().getData());
+			plan = JSonConverter.getAsObject(result.getData(),Plan.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}

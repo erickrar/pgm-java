@@ -95,11 +95,11 @@ public class Customer extends PagarMeModel implements Serializable {
 		this.phones = phones;
 	}
 
-	public Collection<Customer> listAll() throws PagarMeException{
+	public Collection<Customer> listAll() throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsCustomerList(super.listAll(1000,0).getData());
 	}
 
-	public Collection<Customer> listAllWithPagination(int totalInPage, int page) throws PagarMeException{
+	public Collection<Customer> listAllWithPagination(int totalInPage, int page) throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsCustomerList(super.listAll(totalInPage,page).getData());
 	}
 
@@ -111,11 +111,11 @@ public class Customer extends PagarMeModel implements Serializable {
 		phones.add(phone);
 	}
 	
-	public Customer find(int id){
+	public Customer find(int id) throws InvalidOperationException{
 		this.id = id;
 		Customer customer = null;
 		try {
-			customer = JSonConverter.getAsCustomer(find().getData());
+			customer = JSonConverter.getAsObject(find().getData(), Customer.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}
@@ -129,10 +129,10 @@ public class Customer extends PagarMeModel implements Serializable {
 	}
 
 
-	public Customer refresh(){
+	public Customer refresh() throws InvalidOperationException{
 		Customer customer = null;
 		try {
-			customer = JSonConverter.getAsCustomer(refreshModel().getData());
+			customer = JSonConverter.getAsObject(find().getData(), Customer.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}

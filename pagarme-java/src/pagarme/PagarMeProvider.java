@@ -1,8 +1,6 @@
 package pagarme;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import pagarme.converter.JSonConverter;
@@ -12,17 +10,12 @@ import pagarme.exception.PagarMeException;
 import pagarme.util.MapUtil;
 
 import com.google.common.base.Strings;
-import com.sun.jersey.core.util.Base64;
 
 public class PagarMeProvider {
 
 
 	private String apiKey;
 	private String encryptionKey;
-	private List<Customer> customers;
-	private List<Plan> plans;
-	private List<Subscription> subscriptions;
-	private List<Transaction> transatcions;
 	private PagarMeError errors;
 
 	public String getApiKey() {
@@ -32,23 +25,6 @@ public class PagarMeProvider {
 	public String getEncryptionKey() {
 		return encryptionKey;
 	}
-
-	public List<Customer> getCustomers() {
-		return customers;
-	}
-
-	public List<Plan> getPlans() {
-		return plans;
-	}
-
-	public List<Subscription> getSubscriptions() {
-		return subscriptions;
-	}
-
-	public List<Transaction> getTransatcions() {
-		return transatcions;
-	}
-
 
 	public PagarMeError getErrorList() {
 		return errors;
@@ -67,10 +43,6 @@ public class PagarMeProvider {
 
 		this.apiKey= apiKey;
 		this.encryptionKey = encryptionKey;
-		customers = new ArrayList<Customer>();
-		plans = new ArrayList<Plan>();
-		subscriptions = new ArrayList<Subscription>();
-		transatcions = new ArrayList<Transaction>();
 	}
 
 	public Transaction postTransaction(TransactionSetup setup) throws FormatException, PagarMeException{
@@ -80,16 +52,16 @@ public class PagarMeProvider {
 		query.addQueries(JSonConverter.objectToMap(setup));		
 		PagarMeQueryResponse response = query.execute();
 		try{
-			trans = JSonConverter.getAsTransaction(response.getData());
+			trans = JSonConverter.getAsObject(response.getData(),Transaction.class);
 			trans.setProvider(this);
 		}catch(PagarMeException e){
-			errors = JSonConverter.getAsErrorList(response.getData());
+			errors = JSonConverter.getAsObject(response.getData(),PagarMeError.class);
 			throw new PagarMeException(getErrorList().showErrors());
 		}
 
 		return trans;
 	}
-	
+
 
 	public Subscription PostSubscription(SubscriptionSetup setup)  throws FormatException,PagarMeException{
 		Subscription subs = null;
@@ -98,14 +70,13 @@ public class PagarMeProvider {
 		query.addQueries(JSonConverter.objectToMap(setup));
 		PagarMeQueryResponse response = query.execute();
 		try{
-			subs = JSonConverter.getAsSubscription(response.getData());
+			subs = JSonConverter.getAsObject(response.getData(),Subscription.class);
 			subs.setProvider(this);
-
 		}catch(PagarMeException e){
-			errors = JSonConverter.getAsErrorList(response.getData());
+			errors = JSonConverter.getAsObject(response.getData(),PagarMeError.class);
 			throw new PagarMeException(getErrorList().showErrors());
 		}
-		
+
 		return subs;
 	}
 
@@ -129,20 +100,12 @@ public class PagarMeProvider {
 		}
 	}
 
-
-	public  String generateCardHash(CreditCard credirCatd) throws PagarMeException,FormatException, NoSuchAlgorithmException {
+	public  String generateCardHash(CreditCard creditCard) throws PagarMeException,FormatException, NoSuchAlgorithmException {
 		PagarMeQuery query = new PagarMeQuery(this, "GET" , "transactions/card_hash_key");
-		Map<String, Object> map = MapUtil.objectToMap(credirCatd);
+		Map<String, Object> map = MapUtil.objectToMap(creditCard);
 		query.addQueries(map);
 		PagarMeQueryResponse response = query.execute();
-		CardHashKey cardKey = JSonConverter.getAsCardHashKey(response.getData());
-	
-		
-		byte [] encoded = Base64.encode(cardKey.getPublickey());
-		//KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-		//kpg.initialize(2048);
-		//KeyPair keys = kpg.generateKeyPair();
-		//PublicKey pubKey = keys.getPublic();
-		return cardKey.getId()+"_"+new String(encoded);
+		CardHashKey cardKey = JSonConverter.getAsObject(response.getData(),CardHashKey.class);
+		return cardKey.getId()+"_";
 	}
 }

@@ -34,8 +34,8 @@ public class SubscriptionSetup extends TransactionSetup {
 		return plan;
 	}
 
-	public void setPlan(String plan) {
-		this.plan = plan;
+	public void setPlan(String planId) {
+		this.plan = planId;
 	}
 
 	public String getDocumentNumber() {

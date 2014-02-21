@@ -50,4 +50,13 @@ public class CreditCard implements Serializable {
 	public void setCardCvv(String cardCvv) {
 		this.cardCvv = cardCvv;
 	}
+	
+	public String toHtmlParameter(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("card_number=");sb.append(cardNumber);sb.append("&");
+		sb.append("card_holder_name=");sb.append(cardHolderName);sb.append("&");
+		sb.append("card_expiration_date=");sb.append(cardExpirationDate);sb.append("&");
+		sb.append("card_cvv=");sb.append(cardCvv);
+		return sb.toString();
+	}
 }

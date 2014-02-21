@@ -3,6 +3,7 @@ package pagarme;
 import java.util.Collection;
 
 import pagarme.converter.JSonConverter;
+import pagarme.exception.InvalidOperationException;
 import pagarme.exception.PagarMeException;
 
 import com.google.gson.annotations.SerializedName;
@@ -176,22 +177,22 @@ public class Transaction extends PagarMeModel {
 
 	public void refund() throws PagarMeException{
 		String json = new PagarMeQuery(provider, "POST", String.format("transactions/%s/refund", id)).execute().getData();
-		cloneTransaction(JSonConverter.getAsTransaction(json));
+		cloneTransaction(JSonConverter.getAsObject(json,Transaction.class));
 	}
 
-	public Collection<Transaction> listAll() throws PagarMeException{
+	public Collection<Transaction> listAll() throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsTransactionList(super.listAll(1000,0).getData());
 	}
 
-	public Collection<Transaction> listAllWithPagination(int totalPerPage, int page) throws PagarMeException{
+	public Collection<Transaction> listAllWithPagination(int totalPerPage, int page) throws PagarMeException, InvalidOperationException{
 		return JSonConverter.getAsTransactionList(super.listAll(totalPerPage,page).getData());
 	}
 
-	public Transaction find(int id){
+	public Transaction find(int id) throws InvalidOperationException{
 		this.id = id;
 		Transaction trans = null;
 		try {
-			trans = JSonConverter.getAsTransaction(find().getData());
+			trans = JSonConverter.getAsObject(find().getData(),Transaction.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}
@@ -203,7 +204,7 @@ public class Transaction extends PagarMeModel {
 	public Transaction refresh(){
 		Transaction trans = null;
 		try {
-			trans = JSonConverter.getAsTransaction(refreshModel().getData());
+			trans = JSonConverter.getAsObject(refreshModel().getData(),Transaction.class);
 		} catch (PagarMeException e) {
 			e.printStackTrace();
 		}
