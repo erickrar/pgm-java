@@ -39,7 +39,7 @@ public class Transaction extends PagarMeModel {
     private PaymentMethod paymentMethod;
 
     @SerializedName("antifraud_score")
-    private int antifraudScore;
+    private Double antifraudScore;
 
     @SerializedName("boleto_url")
     private String boletoUrl;
@@ -134,11 +134,11 @@ public class Transaction extends PagarMeModel {
         this.paymentMethod = paymentMethod;
     }
 
-    public int getAntifraudScore() {
+    public Double getAntifraudScore() {
         return antifraudScore;
     }
 
-    public void setAntifraudScore(int antifraudScore) {
+    public void setAntifraudScore(Double antifraudScore) {
         this.antifraudScore = antifraudScore;
     }
 
