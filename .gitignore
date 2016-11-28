@@ -20,3 +20,10 @@ target/
 
 TelosysTools
 telosys-tools.cfg
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
